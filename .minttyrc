@@ -1,0 +1,15 @@
+BoldAsFont=yes
+Font=Consolas
+FontHeight=14
+FontSmoothing=full
+Printer=Samsung ML-331x Series
+RightClickAction=paste
+Transparency=medium
+OpaqueWhenFocused=yes
+CursorType=underscore
+Locale=zh_CN
+Charset=UTF-8
+Rows=20
+Columns=150
+BellSound=yes
+ForegroundColour=255,255,255

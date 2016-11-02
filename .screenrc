@@ -1,0 +1,26 @@
+shell -$SHELL
+# ===============================================================
+# xterm tweaks
+# ===============================================================
+defscrollback 100000
+termcapinfo xterm* OL=100000
+termcapinfo xterm* ti@:te@
+
+# ===========================================
+# CAPTION - shows a "caption" for the window.
+# ===========================================
+caption always "%{+b rk}%H%{gk} | %?%-Lw%?%{bw}%n*%f %t%?(%u)%?%{wk}%?%+Lw%? %= %{= KR} %{-}  %{= KG} %{yk}%y.%m.%d %c "
+startup_message off
+
+
+# ===========================================
+# Screen Key
+# ===========================================
+escape ^Oo
+vbell off
+
+#bindkey "^[[27;5;9~" next #ctrl-tab
+#bindkey "^[[27;6;9~" next #ctrl-shift-tab
+#bindkey "^[[1;5I" next
+#bindkey "^[[1;6I" prev
+
