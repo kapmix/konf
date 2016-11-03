@@ -56,78 +56,7 @@
 ;;  (load-theme 'yoshi t))
 
 
-;; For windows
-(if (eq system-type 'windows-nt)
-    (progn
-      (setq tools-dir "D:/Tools")
-      (setq cygwin-dir (concat tools-dir "/cygwin"))
-      (setenv "PATH" 
-      	      (concat cygwin-dir "/usr/local/bin;" cygwin-dir "/usr/bin;" cygwin-dir "/bin;" (getenv "PATH")))
-      (setenv "INFOPATH" 
-      	      (concat tools-dir "/Emacs/info;" cygwin-dir "/usr/share/info;" (getenv "INFOPATH")))
-      (setq exec-path (append `(,(concat cygwin-dir "/bin") ,(concat cygwin-dir "/usr/local/bin")) exec-path))
-      ;; Adding cygwin bash shell
-      (setq shell-file-name (concat cygwin-dir "/bin/bash"))
-      (setenv "SHELL" shell-file-name)
-      (setq explicit-shell-file-name shell-file-name)
-      (setq ediff-shell shell-file-name)
-      (setq explicit-shell-args '("--login" "-i"))
-      (setenv "include" (concat cygwin-dir "/usr/include"))
 
-      (require 'w32-browser)
-      (require 'cygwin-mount)
-      (cygwin-mount-activate)
-      (defadvice grep-compute-defaults (around grep-compute-defaults-advice-null-device)
-        "Use cygwin's /dev/null as the null-device."
-        (let ((null-device "/dev/null"))
-          ad-do-it))
-      (ad-activate 'grep-compute-defaults)
-
-	  (setq w32-get-true-file-attributes nil)
-
-	  ;; Setting about network printer in Windows
-	  ;; in windows terminal, run command like
-	  ;; 	net use LPT3: \\127.0.0.1\PrinterL19 /persistent:yes
-	  ;; set the sharing name of the network printer in its properties: PrinterL19
-	  (setq printer-name "LPT3:")
-
-      (set-selection-coding-system 'utf-8-unix)
-      (set-clipboard-coding-system 'cn-gb-2312)
-      (setq auto-coding-alist
-            (append auto-coding-alist '(("\\.txt\\'" . utf-8-unix))))
-      (setq buffer-file-coding-system 'utf-8-unix)
-      (setq coding-system-for-write 'utf-8-unix)
-	  (setq coding-system-for-read 'utf-8-unix)
-      ))
-
-;; For OSX
-(if (eq system-type 'darwin)
-    (progn
-      (setenv "PATH" 
-			  (concat "/usr/local/bin:" (getenv "PATH")))
-      (setq exec-path
-			(append exec-path '("/usr/local/bin")))
-	  (require 'exec-path-from-shell)
-	  (setq exec-path-from-shell-variables '("PATH" "MANPATH" "USERNAME" "EMAIL"))
-	  (exec-path-from-shell-initialize)
-      (require 'reveal-in-osx-finder)
-      ))
-
-;; For GNU/Linux
-(if (eq system-type 'gnu/linux)
-    (progn
-      ;; Enable copy content from emacs to clipboard
-      ;; in order that other programs can get it.
-      ;;(setq x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING))
-      (setq select-enable-clipboard t)
-      (set-selection-coding-system 'utf-8)
-      (set-clipboard-coding-system 'utf-8)
-
-      (setq auto-coding-alist
-			(append auto-coding-alist '(("\\.txt\\'" . utf-8))))
-      (setq buffer-file-coding-system 'utf-8)
-      (setq coding-system-for-write 'utf-8)
-      ))
 
 (defun gb2312 ()
   "Set coding system to UTF8..."
@@ -195,6 +124,69 @@
       (`gnu/linux (shell-command "nautilus" currdir))
       )))
 
+;; Print to pdf
+(require 'ps-print)
+(setq ps-printer-name t)
+(setq ps-top-margin 100)
+(setq ps-bottom-margin 40)
+(setq ps-font-info-database
+      (append
+       '((Consolas
+          (fonts (normal      . "Consolas")
+                 (bold        . "Consolas-Bold")
+                 (italic      . "Consolas-Italic")
+                 (bold-italic . "Consolas-Bold-Italic"))
+          (size           . 11.0)
+          (line-height    . 13.0)
+          (space-width    . 6.04688)
+          (avg-char-width . 6.04688)))
+       ps-font-info-database))
+(setq ps-font-family 'Consolas)
+(setq ps-font-size 12)
+(setq ps-paper-type 'a4)
+(setq ps-print-color-p t)
+
+;; Page layout: Header [file-name     2011-12-05]
+;;              Footer [                     n/m]
+;; Header
+(setq ps-print-header nil)
+(setq ps-header-lines 1)
+(setq ps-header-font-size 11)
+(setq ps-header-title-font-size 11)
+(setq ps-header-font-family 'Consolas)
+(setq ps-right-header '(ps-time-stamp-yyyy-mm-dd))
+(setq ps-print-header-frame t)        ; no box top
+
+;; Footer
+(setq ps-print-footer t)
+(setq ps-footer-lines 1)
+(setq ps-footer-font-size 11)
+(setq ps-footer-font-family 'Consolas)
+(setq ps-left-footer nil)
+(setq ps-left-footer '(ps-time-stamp-yyyy-mm-dd))
+(setq ps-right-footer (list "/pagenumberstring load"))
+(setq ps-footer-offset 20)
+(setq ps-footer-offset .50)
+(setq ps-footer-line-pad .50)
+(setq ps-print-footer-frame nil)        ; no box bottom
+
+
+(defun pdf-print-buffer-with-faces (&optional filename)
+  "Print file in the current buffer as pdf, including font, color, and
+underline information.  This command works only if you are using a window system,
+so it has a way to determine color values.
+
+C-u COMMAND prompts user where to save the Postscript file (which is then
+converted to PDF at the same location."
+  (interactive (list (if current-prefix-arg
+						 (ps-print-preprint 4)
+					   (concat (file-name-sans-extension (buffer-file-name))
+							   ".ps"))))
+  (ps-print-with-faces (point-min) (point-max) filename)
+  (shell-command (concat "ps2pdf " filename))
+  (delete-file filename)
+  (message "Deleted %s" filename)
+  (message "Wrote %s" (concat (file-name-sans-extension filename) ".pdf")))
 
 (auto-image-file-mode 1)
 (column-number-mode 1)
@@ -283,6 +275,11 @@
 								(font-spec :family "Hiragino Sans GB" :size 18)
 								))))
       ))
+
+;; chinese fonts
+(require 'chinese-fonts-setup)
+(chinese-fonts-setup-enable)
+(cfs-set-spacemacs-fallback-fonts)
 
 ;; dired
 (require 'dired-x)
@@ -660,9 +657,93 @@
   t)
 (setq magit-git-executable "/usr/bin/git")
 
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;; 3. My Configuration about Key binding
+;; 3. About System
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; For windows
+(if (eq system-type 'windows-nt)
+    (progn
+      (setq tools-dir "D:/Tools")
+      (setq cygwin-dir (concat tools-dir "/cygwin"))
+      (setenv "PATH" 
+      	      (concat cygwin-dir "/usr/local/bin;" cygwin-dir "/usr/bin;" cygwin-dir "/bin;" (getenv "PATH")))
+      (setenv "INFOPATH" 
+      	      (concat tools-dir "/Emacs/info;" cygwin-dir "/usr/share/info;" (getenv "INFOPATH")))
+      (setq exec-path (append `(,(concat cygwin-dir "/bin") ,(concat cygwin-dir "/usr/local/bin")) exec-path))
+      ;; Adding cygwin bash shell
+      (setq shell-file-name (concat cygwin-dir "/bin/bash"))
+      (setenv "SHELL" shell-file-name)
+      (setq explicit-shell-file-name shell-file-name)
+      (setq ediff-shell shell-file-name)
+      (setq explicit-shell-args '("--login" "-i"))
+      (setenv "include" (concat cygwin-dir "/usr/include"))
+
+      (require 'w32-browser)
+      (require 'cygwin-mount)
+      (cygwin-mount-activate)
+      (defadvice grep-compute-defaults (around grep-compute-defaults-advice-null-device)
+        "Use cygwin's /dev/null as the null-device."
+        (let ((null-device "/dev/null"))
+          ad-do-it))
+      (ad-activate 'grep-compute-defaults)
+
+	  (setq w32-get-true-file-attributes nil)
+
+
+	  ;; Setting about network printer in Windows
+	  ;; in windows terminal, run command like
+	  ;; 	net use LPT3: \\127.0.0.1\PrinterL19 /persistent:yes
+	  ;; set the sharing name of the network printer in its properties: PrinterL19
+	  (setq printer-name "LPT3:")
+
+	  (setenv "GS_LIB" "d:/Tools/gs/gs9.20/lib")
+	  (setq ps-lpr-command "d:/Tools/gs/gs9.20/bin/bin/gswin64c.exe")
+	  (setq ps-lpr-switches '("-q" "-dNOPAUSE" "-dBATCH" "-sDEVICE=mswinpr2"))
+	  (setq intl-fonts-dir "/usr/share/fonts/intlfonts-1.2.1")
+
+      (set-selection-coding-system 'utf-8-unix)
+      (set-clipboard-coding-system 'cn-gb-2312)
+      (setq auto-coding-alist
+            (append auto-coding-alist '(("\\.txt\\'" . utf-8-unix))))
+      (setq buffer-file-coding-system 'utf-8-unix)
+      (setq coding-system-for-write 'utf-8-unix)
+	  (setq coding-system-for-read 'utf-8-unix)
+      ))
+
+;; For OSX
+(if (eq system-type 'darwin)
+    (progn
+      (setenv "PATH" 
+			  (concat "/usr/local/bin:" (getenv "PATH")))
+      (setq exec-path
+			(append exec-path '("/usr/local/bin")))
+	  (require 'exec-path-from-shell)
+	  (setq exec-path-from-shell-variables '("PATH" "MANPATH" "USERNAME" "EMAIL"))
+	  (exec-path-from-shell-initialize)
+      (require 'reveal-in-osx-finder)
+      ))
+
+;; For GNU/Linux
+(if (eq system-type 'gnu/linux)
+    (progn
+      ;; Enable copy content from emacs to clipboard
+      ;; in order that other programs can get it.
+      ;;(setq x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING))
+      (setq select-enable-clipboard t)
+      (set-selection-coding-system 'utf-8)
+      (set-clipboard-coding-system 'utf-8)
+
+      (setq auto-coding-alist
+			(append auto-coding-alist '(("\\.txt\\'" . utf-8))))
+      (setq buffer-file-coding-system 'utf-8)
+      (setq coding-system-for-write 'utf-8)
+      ))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; 4. My Configuration about Key binding
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (define-key global-map [(control tab)] 'tabbar-forward-tab)
@@ -751,10 +832,3 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(font-lock-comment-face ((t (:foreground "gray60" :slant italic)))))
-
-(require 'chinese-fonts-setup)
-;; 让 chinese-fonts-setup 随着 emacs 自动生效。
-(chinese-fonts-setup-enable)
-;; 让 spacemacs mode-line 中的 Unicode 图标正确显示。
-(cfs-set-spacemacs-fallback-fonts)
-
