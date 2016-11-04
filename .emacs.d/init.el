@@ -9,12 +9,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;
-;; 0. My General configuration
-;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (package-initialize)
 
 ;;(setq package-archives
@@ -30,6 +24,101 @@
 (setq load-path (cons "~/.emacs.d/el" load-path))
 (setq load-path (cons "/usr/share/emacs/site-lisp" load-path))
 (setq load-path (cons "~/.local/share/emacs/site-lisp" load-path))
+
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; 0. About System
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; For windows
+(if (eq system-type 'windows-nt)
+    (progn
+	  (setq explicit-shell-args '("--login" "--init-file" "~/.bash_profile" "-i"))
+      (setq tools-dir "D:/Tools")
+      (setq cygwin-dir (concat tools-dir "/cygwin"))
+      (setenv "PATH" 
+      	      (concat cygwin-dir "/usr/local/bin;" cygwin-dir "/usr/bin;" cygwin-dir "/bin;" (getenv "PATH")))
+      (setenv "INFOPATH" 
+      	      (concat tools-dir "/Emacs/info;" cygwin-dir "/usr/share/info;" (getenv "INFOPATH")))
+      (setq exec-path (append `(,(concat cygwin-dir "/bin") ,(concat cygwin-dir "/usr/local/bin")) exec-path))
+      ;; Adding cygwin bash shell
+      (setq shell-file-name (concat cygwin-dir "/bin/bash"))
+      (setenv "SHELL" shell-file-name)
+      (setq explicit-shell-file-name shell-file-name)
+      (setq ediff-shell shell-file-name)
+      (setq explicit-shell-args '("--login" "-i"))
+      (setenv "include" (concat cygwin-dir "/usr/include"))
+
+      (require 'w32-browser)
+      (require 'cygwin-mount)
+      (cygwin-mount-activate)
+      (defadvice grep-compute-defaults (around grep-compute-defaults-advice-null-device)
+        "Use cygwin's /dev/null as the null-device."
+        (let ((null-device "/dev/null"))
+          ad-do-it))
+      (ad-activate 'grep-compute-defaults)
+
+	  (setq w32-get-true-file-attributes nil)
+
+
+	  ;; Setting about network printer in Windows
+	  ;; in windows terminal, run command like
+	  ;; 	net use LPT3: \\127.0.0.1\PrinterL19 /persistent:yes
+	  ;; set the sharing name of the network printer in its properties: PrinterL19
+	  (setq printer-name "LPT3:")
+
+	  (setenv "GS_LIB" "d:/Tools/gs/gs9.20/lib")
+	  (setq ps-lpr-command "d:/Tools/gs/gs9.20/bin/bin/gswin64c.exe")
+	  (setq ps-lpr-switches '("-q" "-dNOPAUSE" "-dBATCH" "-sDEVICE=mswinpr2"))
+	  (setq intl-fonts-dir "/usr/share/fonts/intlfonts-1.2.1")
+
+      (set-selection-coding-system 'utf-8-unix)
+      (set-clipboard-coding-system 'cn-gb-2312)
+      (setq auto-coding-alist
+            (append auto-coding-alist '(("\\.txt\\'" . utf-8-unix))))
+      (setq buffer-file-coding-system 'utf-8-unix)
+      (setq coding-system-for-write 'utf-8-unix)
+	  (setq coding-system-for-read 'utf-8-unix)
+      ))
+
+;; For OSX
+(if (eq system-type 'darwin)
+    (progn
+      (setenv "PATH" 
+			  (concat "/usr/local/bin:" (getenv "PATH")))
+      (setq exec-path
+			(append exec-path '("/usr/local/bin")))
+	  (require 'exec-path-from-shell)
+	  (setq exec-path-from-shell-variables '("PATH" "MANPATH" "USERNAME" "EMAIL"))
+	  (exec-path-from-shell-initialize)
+      (require 'reveal-in-osx-finder)
+      ))
+
+;; For GNU/Linux
+(if (eq system-type 'gnu/linux)
+    (progn
+      ;; Enable copy content from emacs to clipboard
+      ;; in order that other programs can get it.
+      ;;(setq x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING))
+      (setq select-enable-clipboard t)
+      (set-selection-coding-system 'utf-8)
+      (set-clipboard-coding-system 'utf-8)
+
+      (setq auto-coding-alist
+			(append auto-coding-alist '(("\\.txt\\'" . utf-8))))
+      (setq buffer-file-coding-system 'utf-8)
+      (setq coding-system-for-write 'utf-8)
+      ))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; 1. My General configuration
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (load "sos")
 (require 'tabbar)
@@ -128,7 +217,7 @@
 (require 'ps-print)
 (setq ps-printer-name t)
 (setq ps-top-margin 100)
-(setq ps-bottom-margin 40)
+(setq ps-bottom-margin 20)
 (setq ps-font-info-database
       (append
        '((Consolas
@@ -142,17 +231,17 @@
           (avg-char-width . 6.04688)))
        ps-font-info-database))
 (setq ps-font-family 'Consolas)
-(setq ps-font-size 12)
+(setq ps-font-size 11)
 (setq ps-paper-type 'a4)
 (setq ps-print-color-p t)
 
-;; Page layout: Header [file-name     2011-12-05]
-;;              Footer [                     n/m]
+;; Page layout: Header [file-name            ]
+;;              Footer [2011-12-05        n/m]
 ;; Header
 (setq ps-print-header nil)
 (setq ps-header-lines 1)
-(setq ps-header-font-size 11)
-(setq ps-header-title-font-size 11)
+(setq ps-header-font-size 9)
+(setq ps-header-title-font-size 9)
 (setq ps-header-font-family 'Consolas)
 (setq ps-right-header '(ps-time-stamp-yyyy-mm-dd))
 (setq ps-print-header-frame t)        ; no box top
@@ -160,15 +249,19 @@
 ;; Footer
 (setq ps-print-footer t)
 (setq ps-footer-lines 1)
-(setq ps-footer-font-size 11)
+(setq ps-footer-font-size 9)
 (setq ps-footer-font-family 'Consolas)
-(setq ps-left-footer nil)
 (setq ps-left-footer '(ps-time-stamp-yyyy-mm-dd))
 (setq ps-right-footer (list "/pagenumberstring load"))
 (setq ps-footer-offset 20)
-(setq ps-footer-offset .50)
 (setq ps-footer-line-pad .50)
-(setq ps-print-footer-frame nil)        ; no box bottom
+(setq ps-print-footer-frame nil)
+(setq ps-footer-frame-alist (quote ((fore-color . 0.0)
+									(back-color . 1.0)
+									(border-width . 0.0)
+									(border-color . 0.0)
+									(shadow-color . 1.0))))
+
 
 
 (defun pdf-print-buffer-with-faces (&optional filename)
@@ -658,92 +751,10 @@ converted to PDF at the same location."
 (setq magit-git-executable "/usr/bin/git")
 
 
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;; 3. About System
-;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; For windows
-(if (eq system-type 'windows-nt)
-    (progn
-      (setq tools-dir "D:/Tools")
-      (setq cygwin-dir (concat tools-dir "/cygwin"))
-      (setenv "PATH" 
-      	      (concat cygwin-dir "/usr/local/bin;" cygwin-dir "/usr/bin;" cygwin-dir "/bin;" (getenv "PATH")))
-      (setenv "INFOPATH" 
-      	      (concat tools-dir "/Emacs/info;" cygwin-dir "/usr/share/info;" (getenv "INFOPATH")))
-      (setq exec-path (append `(,(concat cygwin-dir "/bin") ,(concat cygwin-dir "/usr/local/bin")) exec-path))
-      ;; Adding cygwin bash shell
-      (setq shell-file-name (concat cygwin-dir "/bin/bash"))
-      (setenv "SHELL" shell-file-name)
-      (setq explicit-shell-file-name shell-file-name)
-      (setq ediff-shell shell-file-name)
-      (setq explicit-shell-args '("--login" "-i"))
-      (setenv "include" (concat cygwin-dir "/usr/include"))
-
-      (require 'w32-browser)
-      (require 'cygwin-mount)
-      (cygwin-mount-activate)
-      (defadvice grep-compute-defaults (around grep-compute-defaults-advice-null-device)
-        "Use cygwin's /dev/null as the null-device."
-        (let ((null-device "/dev/null"))
-          ad-do-it))
-      (ad-activate 'grep-compute-defaults)
-
-	  (setq w32-get-true-file-attributes nil)
-
-
-	  ;; Setting about network printer in Windows
-	  ;; in windows terminal, run command like
-	  ;; 	net use LPT3: \\127.0.0.1\PrinterL19 /persistent:yes
-	  ;; set the sharing name of the network printer in its properties: PrinterL19
-	  (setq printer-name "LPT3:")
-
-	  (setenv "GS_LIB" "d:/Tools/gs/gs9.20/lib")
-	  (setq ps-lpr-command "d:/Tools/gs/gs9.20/bin/bin/gswin64c.exe")
-	  (setq ps-lpr-switches '("-q" "-dNOPAUSE" "-dBATCH" "-sDEVICE=mswinpr2"))
-	  (setq intl-fonts-dir "/usr/share/fonts/intlfonts-1.2.1")
-
-      (set-selection-coding-system 'utf-8-unix)
-      (set-clipboard-coding-system 'cn-gb-2312)
-      (setq auto-coding-alist
-            (append auto-coding-alist '(("\\.txt\\'" . utf-8-unix))))
-      (setq buffer-file-coding-system 'utf-8-unix)
-      (setq coding-system-for-write 'utf-8-unix)
-	  (setq coding-system-for-read 'utf-8-unix)
-      ))
-
-;; For OSX
-(if (eq system-type 'darwin)
-    (progn
-      (setenv "PATH" 
-			  (concat "/usr/local/bin:" (getenv "PATH")))
-      (setq exec-path
-			(append exec-path '("/usr/local/bin")))
-	  (require 'exec-path-from-shell)
-	  (setq exec-path-from-shell-variables '("PATH" "MANPATH" "USERNAME" "EMAIL"))
-	  (exec-path-from-shell-initialize)
-      (require 'reveal-in-osx-finder)
-      ))
-
-;; For GNU/Linux
-(if (eq system-type 'gnu/linux)
-    (progn
-      ;; Enable copy content from emacs to clipboard
-      ;; in order that other programs can get it.
-      ;;(setq x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING))
-      (setq select-enable-clipboard t)
-      (set-selection-coding-system 'utf-8)
-      (set-clipboard-coding-system 'utf-8)
-
-      (setq auto-coding-alist
-			(append auto-coding-alist '(("\\.txt\\'" . utf-8))))
-      (setq buffer-file-coding-system 'utf-8)
-      (setq coding-system-for-write 'utf-8)
-      ))
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;
-;; 4. My Configuration about Key binding
+;; 3. My Configuration about Key binding
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (define-key global-map [(control tab)] 'tabbar-forward-tab)
@@ -808,7 +819,7 @@ converted to PDF at the same location."
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;; 4. Gnus
+;; 5. Gnus
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;(add-to-list 'load-path "~/.emacs.d/gnus")
