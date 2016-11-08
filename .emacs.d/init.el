@@ -456,6 +456,7 @@ converted to PDF at the same location."
 (setq org-export-with-sub-superscripts (quote {}))
 (setq org-log-done 'time)
 (add-hook 'org-mode-hook 'turn-on-font-lock)
+(add-hook 'org-mode-hook (lambda () (auto-fill-mode -1)))
 (setq org-export-with-tags nil)
 (setq org-startup-folded (quote content))
 (setq org-todo-keywords
