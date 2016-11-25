@@ -1,0 +1,146 @@
+1999-12-07  Kenichi Handa  <handa@etl.go.jp>
+
+	* make-dist (files): Include rmoldfnt.sh, not rm-oldfonts.sh.
+
+	* aclocal.m4: Deleted.
+
+	* ToMAINTAINER: Deleted.
+
+	* rmoldfnt.sh: Renamed from rm-oldfonts.sh.
+
+	* configure.in: Include the code in aclocal.m4.  Check ${COMSPEC}
+	for DOS.  For DOS, PCF fonts are not installed by default..
+
+	* Makefile.in: Remove macros `prefix' and `datadir'.  Run
+	${srcdir}/rmoldfnt.sh via $(SHELL).
+	(truetype): Target name changed from ttype.
+	($(srcdir)/configure): Remove aclocal.m4 from dependencies.
+	(dist, arc, split, diff, pack): These targets removed.
+
+	* Asian/ind24-uni.bdf, Asian/ind16-uni.bdf: New fonts.
+
+	* Emacs.ap: Add lines "BEGIN ..." and "END ...".
+
+	* Asian/isci16-mule.bdf: Add ATR glyph at ENCDOING 111.
+
+	* Asian/lao16-mule.bdf: Remove unnecessary property
+	_MULE_BASELINE_OFFSET.
+
+1999-07-07  Kenichi Handa  <handa@etl.go.jp>
+
+	* aclocal.m4 (AC_PATH_FONTDIR): Fix typo, lispdir->fontdir.
+
+1999-06-29  Takahashi N. <ntakahas@etl.go.jp>
+
+	* Asian/xtis18.bdf: Correct point size.
+
+1999-06-24  Kenichi Handa  <handa@etl.go.jp>
+
+	* make-dist (files): Add ChangeLog configure.in aclocal.m4
+	configure, change Makefile to Makefile.in, delete make.hlp.
+
+	* configure.in, aclocal.m4, install-sh: New files.
+
+	* configure: New file.  Generated from configure.in and aclocal.m4
+	by autoconf 2.13.
+
+	* Makefile.in: Renamed and modified from Makefile.  Big change for
+	configure.
+
+	* make.hlp: This file deleted.
+
+1999-06-16  Kenichi Handa  <handa@etl.go.jp>
+
+	* Asian/xtis24.bdf: New font file.
+	* Asian/xtis18.bdf: New font file.
+	* Asian/fonts.alias: New file. 
+
+1999-06-11  Kenichi Handa  <handa@etl.go.jp>
+
+	* European/fonts.alias: Add a newline at the tail.
+
+1999-06-09  Kenichi Handa  <handa@etl.go.jp>
+
+	* make.hlp (ttype): Fix comments to the targets type1 and ttype.
+
+	* make-dist (distdir): Make Type1.tar.gz and TrueType.tar.gz in
+	splited archive directory.
+
+	* Emacs.ap: Remove fontset-20.
+
+	* Asian/ind1c16-mule.bdf: Fix PIXEL_SIZE and POINT_SIZE.
+	* Asian/tib1c16-mule.bdf: Likewise.
+
+1999-06-03  Kenichi Handa  <handa@etl.go.jp>
+
+	* Asian/ind1c24-mule.bdf: Fix PIXEL_SZIE and POINT_SIZE.
+	* Asian/tib1c24-mule.bdf: Likewise.
+
+1999-05-27  Kenichi Handa  <handa@etl.go.jp>
+
+	* European/koi14-etl.bdf: Fontname changed to KOI8-R, add e with",
+	E with ", hard capital sign.
+
+	* European/koi16-etl.bdf, European/koi24-etl: Likewise.
+	
+	* European/fonts.alias: Change entries for KOI8.
+
+1999-04-07  Kenichi Handa  <handa@etl.go.jp>
+
+	* make-dist (files): Include Emacs.ap.
+
+	* Emacs.ap: New file.
+
+1999-03-05  Eli Zaretskii <eliz@is.elta.co.il>
+
+	* Makefile: New variable SHELL.  Replace `sh' by `${SHELL}'.
+	Quote arguments of `echo'.
+
+1999-03-05  Kenichi Handa  <handa@etl.go.jp>
+
+	* Makefile: Change xxx-X and xxx-BIG to xxx.X and xxx.BIG
+	respectively.
+
+	* make-dist (files): Include "rm-oldfonts.sh".
+
+1999-03-02  Kenichi Handa  <handa@etl.go.jp>
+
+	* make-dist: Adjusted for the name change of README-split to
+	README.split.
+	(sizes): Include 18.
+
+	* Makefile: Big change for version 1.2.  For working file, use
+	the directory ${INSTALLDIR}.
+	(all): Installes PCF and BDF fonts.
+	(${SUBDIRS} ${SUBDIRS_X} ${SUBDIRS_BIG}): Used for both PCF and
+	BDF installation.
+	(help, bdf, type1, ttype): New targets.
+
+	* Type1: New directory containing Type1 fonts.
+
+	* TrueType: New directory containing TrueType fonts.
+
+	* NEWS: New file.
+
+	* make.hlp: New file.
+
+	* rm-oldfonts.sh: New file.
+
+1998-07-16  Kenichi Handa  <handa@etl.go.jp>
+
+	* Makefile (TIMESTAMPFILE): New variable.
+	(${SUBDIRS} ${SUBDIRS_X} ${SUBDIRS_BIG}): Check TIMESTAMPFILE.
+	(all): Handle TIMESTAMPFILE.
+
+1998-03-30  Ken'ichi Handa  <handa@melange.gnu.org>
+
+	* Version 1.1 released.
+	
+1998-03-30  Ken'ichi Handa  <handa@melange.gnu.org>
+
+	* make-dist: Fix a bug in if condition.
+
+1998-01-21  Kenichi Handa  <handa@etl.go.jp>
+
+        * Makefile (${SUBDIRS} ${SUBDIRS_X} ${SUBDIRS_BIG}): Give -p arg
+	to mkdir.

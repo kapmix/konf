@@ -21,10 +21,14 @@
 (setq package-archives '(("gnu"   . "http://elpa.zilongshanren.com/gnu/")
                          ("melpa" . "http://elpa.zilongshanren.com/melpa/")))
 
-(setq load-path (cons "~/.emacs.d/el" load-path))
+(setq default-directory "~/.emacs.d")
+(setq default-elisp-directory (concat default-directory "/el"))
+(setq default-data-directory (concat default-directory "/data"))
+(setq default-tmp-directory (concat default-directory "/tmp"))
+
+(setq load-path (cons default-elisp-directory load-path))
 (setq load-path (cons "/usr/share/emacs/site-lisp" load-path))
 (setq load-path (cons "~/.local/share/emacs/site-lisp" load-path))
-
 
 
 
@@ -43,7 +47,8 @@
       	      (concat cygwin-dir "/usr/local/bin;" cygwin-dir "/usr/bin;" cygwin-dir "/bin;" (getenv "PATH")))
       (setenv "INFOPATH" 
       	      (concat tools-dir "/Emacs/info;" cygwin-dir "/usr/share/info;" (getenv "INFOPATH")))
-      (setq exec-path (append `(,(concat cygwin-dir "/bin") ,(concat cygwin-dir "/usr/local/bin")) exec-path))
+      ;(setq exec-path (append `(,(concat cygwin-dir "/bin") ,(concat cygwin-dir "/usr/local/bin")) exec-path))
+	  (setq exec-path (append exec-path '("D:/Tools/cygwin/bin/")))
       ;; Adding cygwin bash shell
       (setq shell-file-name (concat cygwin-dir "/bin/bash"))
       (setenv "SHELL" shell-file-name)
@@ -129,6 +134,7 @@
 (require 'ibuffer)
 (require 'session)
 (add-hook 'after-init-hook 'session-initialize)
+(setq session-save-file (concat default-tmp-directory "/session"))
 
 ;; undo-tree
 (global-undo-tree-mode)
@@ -137,6 +143,7 @@
 (setq recentf-max-saved-items 100
       recentf-max-menu-items 15)
 (recentf-mode 1)
+(setq recentf-save-file (concat default-tmp-directory "/recentf"))
 
 ;; Color theme
 ;;(when window-system
@@ -284,11 +291,12 @@ converted to PDF at the same location."
 (auto-image-file-mode 1)
 (column-number-mode 1)
 (delete-selection-mode 1)
-(desktop-save-mode 1)
+
 (display-time)
 (electric-pair-mode 1)
 (fset 'yes-or-no-p 'y-or-n-p)
 (ido-mode 1)
+(setq ido-save-directory-list-file (concat default-tmp-directory "/ido.last"))
 (mouse-avoidance-mode 'animate)
 (put 'upcase-region 'disabled nil)
 (menu-bar-mode 0)
@@ -308,12 +316,12 @@ converted to PDF at the same location."
 (setq-default line-spacing 4)
 
 (setq auto-save-interval 5)
-(setq bookmark-default-file "~/.emacs.d/default/emacs.bmk")
+(setq bookmark-default-file (concat default-data-directory "/emacs.bmk"))
 (setq bookmark-save-flag 1)
 (setq confirm-kill-emacs 'yes-or-no-p)
 ;;(setq major-mode 'text-mode)
-(setq default-directory "~/.emacs.d")
-(setq desktop-load-locked-desktop t)
+
+
 (setq display-time t)
 (setq display-time-24hr-format t)
 (setq display-time-24hr-format t)
@@ -371,6 +379,7 @@ converted to PDF at the same location."
 
 ;; chinese fonts
 (require 'chinese-fonts-setup)
+(setq cfs-profiles-directory (concat default-data-directory "/chinese-fonts-setup"))
 (chinese-fonts-setup-enable)
 (cfs-set-spacemacs-fallback-fonts)
 
@@ -433,10 +442,24 @@ converted to PDF at the same location."
        )
       )
 
-(setq my-desktop-dirname "~/.emacs.d/desktop/")
+(require 'auto-complete-config)
+(ac-config-default)
+(setq ac-comphist-file (concat default-tmp-directory "/ac-comphist.dat"))
+
+(autoload
+  'ace-jump-mode
+  "ace-jump-mode"
+  "Emacs quick move minor mode"
+  t)
+
+
+(setq my-desktop-dirname (concat default-tmp-directory "/desktop/"))
 (if (not (file-exists-p my-desktop-dirname))
     (make-directory my-desktop-dirname))
 (setq desktop-dirname my-desktop-dirname)
+(desktop-save-mode 1)
+(setq desktop-load-locked-desktop t)
+(add-to-list 'desktop-path my-desktop-dirname)
 
 (server-force-delete)
 (server-start)
@@ -449,7 +472,7 @@ converted to PDF at the same location."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; document
-(setq load-path (cons "~/.emacs.d/el/doc" load-path))
+(setq load-path (cons (concat default-elisp-directory "/doc") load-path))
 
 ;; Org
 (require 'org)
@@ -601,7 +624,7 @@ converted to PDF at the same location."
     (let* ((dir (ignore-errors (file-name-directory (buffer-file-name))))
            (path (concat dir "style.css"))
            (homestyle (or (null dir) (null (file-exists-p path))))
-           (final (if homestyle "~/.emacs.d/data/css/org-style.css" path)))
+           (final (if homestyle (concat default-data-directory "/css/org-style.css") path)))
       (setq org-html-head-include-default-style nil)
       (setq org-html-head (concat
                            "<style type=\"text/css\">\n"
@@ -619,6 +642,8 @@ converted to PDF at the same location."
 (setq org-export-default-language "zh-CN")
 (setq user-mail-address (getenv "EMAIL"))
 (setq user-full-name (getenv "USERNAME"))
+
+(add-to-list 'ac-modes 'org-mode)
 
 ;; latex
 ;;(while nil
@@ -638,10 +663,10 @@ converted to PDF at the same location."
 
 
 (require 'remember)
-(setq-default remember-data-file (concat default-directory "notes"))
+(setq-default remember-data-file (concat default-directory "/notes"))
 
 ;; Calender/Diary
-(setq diary-file "~/.emacs.d/default/diary")
+(setq diary-file (concat default-data-directory "/diary"))
 (setq calendar-latitude 39.9599)
 (setq calendar-longitude 116.4543)
 (setq calendar-date-style 'iso)
@@ -716,6 +741,17 @@ converted to PDF at the same location."
 (require 'php-mode)
 (require 'htmlize)
 
+;; Python
+(setq python-environment-virtualenv '("virtualenv" "--system-site-packages" "--quiet" "--python" "D:/Tools/cygwin/bin/python3"))
+(require 'jedi-direx)
+(add-hook 'python-mode-hook 'jedi:setup)
+(setq jedi:complete-on-dot t)
+(setq jedi:setup-keys t)
+(eval-after-load "python"
+  '(define-key python-mode-map "\C-cx" 'jedi-direx:pop-to-buffer))
+(add-hook 'jedi-mode-hook 'jedi-direx:setup)
+(setq jedi:server-command '("D:/Tools/cygwin/bin/python3" "C:/Users/qiang/.emacs.d/elpa/jedi-core-20160709.722/jediepcserver.py"))
+
 ;; GNU global
 (setq gtags-suggested-key-mapping t)
 (require 'gtags)
@@ -734,24 +770,8 @@ converted to PDF at the same location."
                             (menu-bar-lines . 0)
                             (fullscreen . nil)))
 (blink-cursor-mode -1)
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;
-;; Elpa/Melpa Package
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;(which-key-mode)
 
-(require 'auto-complete-config)
-(ac-config-default)
-(add-to-list 'ac-modes 'org-mode)
-
-(autoload
-  'ace-jump-mode
-  "ace-jump-mode"
-  "Emacs quick move minor mode"
-  t)
 (setq magit-git-executable "/usr/bin/git")
-
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -836,7 +856,7 @@ converted to PDF at the same location."
  '(large-file-warning-threshold nil)
  '(package-selected-packages
    (quote
-	(chinese-fonts-setup org which-key undo-tree magit graphviz-dot-mode ggtags elpy auto-complete ace-jump-mode)))
+	(jedi-direx jedi chinese-fonts-setup org which-key undo-tree magit graphviz-dot-mode ggtags auto-complete ace-jump-mode)))
  '(session-use-package t nil (session)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.

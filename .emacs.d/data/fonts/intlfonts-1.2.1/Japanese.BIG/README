@@ -1,0 +1,6 @@
+JISX0208.1983 (JIS-Kanji) fonts
+	j83-32.bdf	created from jiskan16.bdf by bdfresize
+	j83-48.bdf	created from jiskan24.bdf by bdfresize
+
+JISX0212 (JIS-Kanji supplementary) fonts
+	jksp40.bdf	by Koichi Yasuoka <yasuoka@kudpc.kyoto-u.ac.jp>

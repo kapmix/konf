@@ -1,0 +1,15 @@
+Chinese simplified (GB2312.1980):
+	guob16.bdf	GB2312 + GB8565-88 by Koichi Yasuoka
+
+Chinese tranditional (CNS11643):
+	cns[1-7]-16.bdf	automatically generated from cns[1-7]-40.bdf
+	cns[1-7]-24.bdf	...
+
+Chinese tranditional (BIG5):
+	taipei16.bdf	ftp.ifcss.org: /software/fonts
+	taipei24.bdf	...
+
+Chinese SiSheng:
+	sish14-etl.bdf		by ETL, still under development
+	sish16-etl.bdf		...
+	sish24-etl.bdf		...

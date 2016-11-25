@@ -1,0 +1,17 @@
+Japanese Roman&Kana (JISX0201):
+	a18rk.bdf	by K. Odajima <odajima@mt.cs.keio.ac.jp>
+	a18rk{b,i,bi}.bdf by K.Handa <handa@etl.go.jp> from a18rk.bdf
+
+Japanese Kanji (JISX0208.1978):
+	j78-16.bdf	 by Koichi Yasuoka <yasuoka@kudpc.kyoto-u.ac.jp>
+
+Japanese Kanji (JISX0208.1983):
+	j83-18.bdf	by K.Handa <handa@etl.go.jp> from jiskan16.bdf
+	j83-18{b,i}.bdf	by K.Handa <handa@etl.go.jp> from j83-18.bdf
+
+Japanese Kanji (JISX0208.1990):
+	j90-16.bdf	by ntakahas@etl.go.jp and takada@seraph.ntt.jp
+
+Japanese Kanji supplement (JISX0212):
+	jksp16.bdf	by Koichi Yasuoka <yasuoka@kudpc.kyoto-u.ac.jp>
+	jksp24.bdf	generated from jisksp40.bdf by bdfresize.

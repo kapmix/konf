@@ -1,0 +1,115 @@
+fontdir = @fontdir@
+srcdir =@srcdir@
+
+BDFTOPCF  = bdftopcf
+MKFONTDIR = mkfontdir
+COMPRESS  = @compress@
+
+RM        = rm -f
+SHELL	  = /bin/sh
+
+INSTALL   = @INSTALL@
+
+SUBDIRS =	European Asian Chinese Japanese Ethiopic Misc
+SUBDIRS_X =	Chinese.X Japanese.X Korean.X
+SUBDIRS_BIG =	European.BIG Chinese.BIG Japanese.BIG
+
+TARGETS = @targets@
+
+all:
+
+install: ${TARGETS}
+
+distclean: clean
+	$(RM) config.* Makefile
+
+clean:
+
+pcf: FRC
+	@if [ -d ${fontdir} ] ; then \
+	  echo "Deleting PCF fonts installed by the previous intlfonts..." ; \
+	  $(SHELL) ${srcdir}/rmoldfnt.sh ${fontdir} ; \
+	else \
+	  $(INSTALL) -d ${fontdir} ; \
+	fi
+	@if [ -f ${fontdir}/fonts.alias ] ; then \
+	  cat ${fontdir}/fonts.alias > ${fontdir}/temp ; \
+	else \
+	  rm -f ${fontdir}/temp ; \
+	fi
+	@for dirs in ${SUBDIRS} ${SUBDIRS_X} ${SUBDIRS_BIG}; do \
+	  if [ -d ${srcdir}/$${dirs} ] ; then \
+	    for f in ${srcdir}/$${dirs}/*.bdf; do \
+	      FONT=`basename $${f} .bdf`.pcf ; \
+	      echo "Installing ${fontdir}/$${FONT}..." ; \
+	      $(BDFTOPCF) $${f} > ${fontdir}/$${FONT} ; \
+	    done ; \
+	    if [ -f ${srcdir}/$${dirs}/fonts.alias ] ; then \
+	      cat ${srcdir}/$${dirs}/fonts.alias >> ${fontdir}/temp ; \
+	    fi ; \
+	  else true; fi ; \
+	done
+	@if [ -f ${fontdir}/temp ] ; then \
+	  sort < ${fontdir}/temp | uniq > ${fontdir}/fonts.alias ; \
+	  rm -f ${fontdir}/temp ; \
+	fi
+	@if [ "${COMPRESS}" != "no" ] ; then \
+	  echo "Compressing PCF fonts by ${COMPRESS}..." ; \
+	  rm -f ${fontdir}/*.pcf.* ; \
+	  ${COMPRESS} ${fontdir}/*.pcf ; \
+	fi
+	@echo "Making ${fontdir}/fonts.dir..."
+	$(MKFONTDIR) ${fontdir}
+	@echo "-----------------------------------------------------------"
+	@echo "Read README for how to inform X server about the new fonts."
+	@echo "-----------------------------------------------------------"
+
+bdf: FRC
+	@if [ -d ${fontdir}/bdf ] ; then \
+	  echo "Deleting BDF fonts installed by the previous intlfonts..." ; \
+	  $(SHELL) ${srcdir}/rmoldfnt.sh ${fontdir}/bdf ; \
+	else \
+	  $(INSTALL) -d ${fontdir}/bdf ; \
+	fi
+	@echo "Installing BDF fonts..."
+	@for dirs in ${SUBDIRS} ${SUBDIRS_X} ${SUBDIRS_BIG}; do \
+	  if [ -d ${srcdir}/$${dirs} ] ; then \
+	    for f in ${srcdir}/$${dirs}/*.bdf; do \
+	      $(INSTALL) -m 0444 $${f} ${fontdir}/bdf ; \
+	    done ; \
+	  else true; fi ; \
+	done
+
+type1: FRC
+	@if [ -d ${srcdir}/Type1 ] ; then \
+	  [ -d ${fontdir}/Type1 ] || $(INSTALL) -d ${fontdir}/Type1 ; \
+	  echo "Installing Type1 fonts..." ; \
+	  for f in ${srcdir}/Type1/*.?f?; do \
+	    $(INSTALL) -c -m 0444 $${f} ${fontdir}/Type1 ; \
+	  done ; \
+	else \
+	  echo "No Type1 fonts" ; \
+	fi
+
+truetype: FRC
+	@if [ -d ${srcdir}/TrueType ] ; then \
+	  [ -d ${fontdir}/TrueType ] || $(INSTALL) -d ${fontdir}/TrueType ; \
+	  echo "Installing TrueType fonts..." ; \
+	  for f in ${srcdir}/TrueType/*.ttf; do \
+	    $(INSTALL) -c -m 0444 $${f} ${fontdir}/TrueType ; \
+	  done ; \
+	else \
+	  echo "No TrueType fonts" ; \
+	fi
+
+FRC:
+
+# Automatic makefile rebuilding
+Makefile: $(srcdir)/Makefile.in config.status
+	./config.status
+
+$(srcdir)/configure: $(srcdir)/configure.in
+	cd $(srcdir) && autoreconf
+
+./config.status: $(srcdir)/configure
+	cd . && ./config.status --recheck

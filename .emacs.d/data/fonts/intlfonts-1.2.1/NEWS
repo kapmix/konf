@@ -1,0 +1,31 @@
+Intlfonts NEWS -- history of user visible changes.  9 June 1999
+
+
+* Changes in intlfonts 1.2
+
+** Configurization
+
+You can use `configure' script for the installation.
+
+** BDF file name changed for DOS.
+
+As DOS has a limit on file name length (8+3), most of BDF file names
+have been changed.  For instance, etl16-latin1.bdf is changed to
+lt1-16-etl.bdf.   The generic rule of file name is:
+	Charset[-]SizeStyle[-Subscript].bdf
+
+** Bold, Italic, Bold-Italic styles are added.
+
+Now several fonts have these variants.
+
+** Type1 and TrueType fonts are added for Latin-X, Thai, and Vietnamese.
+
+Though, these fonts are not yet used by Emacs.
+
+** New file Emacs.ap contains sample X resource setting.
+
+
+Local variables:
+mode: outline
+paragraph-separate: "[ 	]*$"
+end:

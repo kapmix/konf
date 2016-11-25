@@ -1,0 +1,15 @@
+;;;; Emacs Bookmark Format Version 1 ;;;;
+;;; This format is meant to be slightly human-readable;
+;;; nevertheless, you probably don't want to edit it.
+;;; -*- End Of Bookmark File Format Version Stamp -*-
+(("Hukou"
+ (filename . "f:/personal/Hukou/")
+ (front-context-string . "wanshui.pdf\n  -r")
+ (rear-context-string . "828 11-04 19:11 ")
+ (position . 217))
+("mydoc"
+ (filename . "d:/doc/mydoc/")
+ (front-context-string . "algorithms\n  drw")
+ (rear-context-string . "  0 2008-07-31  ")
+ (position . 229))
+)

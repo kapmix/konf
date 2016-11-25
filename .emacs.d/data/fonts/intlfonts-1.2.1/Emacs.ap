@@ -1,0 +1,12 @@
+!! BEGIN intlfonts setup
+!! By default, use 16 dots fonts
+Emacs.Font: fontset-16
+!! For small screen users (eg. 640x480 or 800x600)
+Emacs.Fontset-0: -etl-*-medium-r-normal-*-14-*-*-*-*-*-fontset-14
+!! For meidum screen users (eg. 1024x780)
+Emacs.Fontset-1: -etl-*-medium-r-normal-*-16-*-*-*-*-*-fontset-16
+!! For meidum screen users (eg. 1024x780) suitable for Thai characters
+Emacs.Fontset-2: -etl-*-medium-r-normal-*-18-*-*-*-*-*-fontset-18
+!! For large screen users (eg. 1280x1024 or larger)
+Emacs.Fontset-3: -etl-*-medium-r-normal-*-24-*-*-*-*-*-fontset-24
+!! END intlfonts setup

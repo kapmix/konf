@@ -1,0 +1,206 @@
+#!/bin/sh
+
+#### make-dist: create an Intlfonts distribution tar file from the current
+#### source tree.
+
+prog="$0"
+
+if [ ! -f README -o ! -d European ] ; then
+  echo "${prog}: Can't find README file or European subdirectory." >&2
+  echo "${prog} must be run in the top directory of the intlfonts" >&2
+  echo "distribution tree." >&2
+  exit 1
+fi
+
+version=`sed -n '1 s/.*International Fonts Ver\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\1 \2 \3/p' < README`
+
+if [ -z "${version}" ] ; then
+  echo "${prog}: Header of README doesn't contain valid version number." >&2
+  exit 1
+fi
+
+files="README NEWS ChangeLog configure.in configure Makefile.in rmoldfnt.sh install-sh Emacs.ap make-dist"
+subdirs="European European.BIG Asian Chinese Chinese.BIG Chinese.X\
+	Japanese Japanese.BIG Japanese.X Korean.X Ethiopic Misc\
+	TrueType Type1"
+sizes="14 16 18 24 32 40 48"
+
+dist=no
+tar=no
+split=no
+diff=no
+pack=no
+
+while [ $# -gt 0 ] ; do
+  case "$1" in
+    ## This option tells make-dist to make the new distribution normally,
+    ## This will make a directory, for instance, intlfonts-1.1.
+    "--dist" )
+      dist=yes
+    ;;
+    ## This option tells make-dist to make an archive file
+    ## (e.g. intlfonts-1.1.tar.gz) of the latest distribution.
+    "--arc" )
+      arc=yes
+    ;;
+    ## This option tells make-dist to make an splited archives files
+    ## (e.g. intlfonts-1.1-split/Asian.tar.gz) of the latest distribution.
+    ## This also enable `--dist'.
+    "--split" )
+      split=yes
+    ;;
+    ## This option tells make-dist to make a diff file
+    ## (e.g. intlfonts-1.1-1.2.diff) between previous and latest
+    ## distributions.
+    ## This also enable `--dist'.
+    "--diff" )
+      diff=yes
+    ;;
+    ## This option tells make-dist to pack the latest files in this directory
+    ## into intlfonts.tar.gz.  This may be useful to move this directory to
+    ## some other place.
+    ## Note that old versions are not included in the packed file!
+    "--pack" )
+      pack=yes
+    ;;
+    * )
+      echo "${prog}: Unrecognized argument: $1" >&2
+      echo "The valid arguments are --dist, --arc, --diff, and --pack." >&2
+      exit 1
+    ;;
+  esac
+  shift
+done
+
+if [ "${pack}" = "yes" ] ; then
+  echo "Packing the latest files in this directory into intlfonts.tar.gz..."
+  mkdir intlfonts
+  ln ${files} make-dist README.split intlfonts
+  for dir in ${subdirs}; do
+    mkdir intlfonts/${dir}
+    for file in ${dir}/*; do
+      if [ -f ${file} ] ; then
+        ln ${file} ${distdir}/${dir}
+      fi
+    done
+  done
+  mkdir intlfonts/RCS
+  for f in RCS/*; do
+    ln ${f} intlfonts/RCS
+  done
+  tar cfz intlfonts.tar.gz intlfonts
+  rm -rf intlfonts
+  exit 0
+fi
+
+set ${version}
+major=$1
+minor=$2
+release=$3
+if [ "x$release" = "x" ] ; then
+  version=${major}.${minor}
+else
+  version=${major}.${minor}.${release}
+fi
+
+echo "The latest version is ${version}."
+
+if [ "${dist}" = "no" -a "${arc}" = "no" -a "${diff}" = "no" ] ; then
+  echo "${prog}: Specify at least one of --dist, --arc, and --diff." >&2
+  exit 1
+fi
+
+distdir=intlfonts-${version}
+
+## If the latest distribution directory is not yet created,
+## create it for the arguments --arc, --split, and --diff.
+if [ ! -d ${distdir} ] ; then
+  if [ "${arc}" = "yes" -o "${split}" = "yes" -o "${diff}" = "yes" ] ; then
+    dist=yes
+  fi
+fi
+
+if [ "${dist}" = "yes" ] ; then
+  if [ -d ${distdir} ] ; then
+    echo "${prog}: Directory ${distdir} already exists." >&2
+    exit 1
+  fi
+
+  echo "Creating the distribution directory ${distdir}..."
+
+  mkdir ${distdir}
+  echo "Linking ${files}..."
+  ln ${files} ${distdir}
+  for dir in ${subdirs}; do
+    echo "Linking ${dir}..."
+    mkdir ${distdir}/${dir}
+    for file in ${dir}/*; do
+      if [ -f ${file} ] ; then
+        ln ${file} ${distdir}/${dir}
+      fi
+    done
+#    ln ${dir}/README ${distdir}/${dir}
+#    ln ${dir}/*.bdf ${distdir}/${dir}
+#    if [ -f ${dir}/fonts.alias ] ; then
+#      ln ${dir}/fonts.alias ${distdir}/${dir}
+#    fi
+  done
+fi
+
+if [ "${arc}" = "yes" ] ; then
+  echo "Making ${distdir}.tar.gz..."
+  
+  tar cfz ${distdir}.tar.gz ${distdir}
+  echo "Contents of ${distdir}.tar.gz are:"
+  tar tfz ${distdir}.tar.gz
+  echo "Archive file ${distdir}.tar.gz is ready to be copied to ftp directory."
+fi
+
+if [ "${split}" = "yes" ] ; then
+  echo "Making splitted archives files under ${distdir}-split..."
+  mkdir ${distdir}-split
+  cp README.split ${distdir}-split
+  for dir in ${subdirs}; do
+    echo "Making ${distdir}-split/${dir}.tar.gz..."
+    tar cfz ${distdir}-split/${dir}.tar.gz ${distdir}/${dir} \
+	`for f in ${files}; do echo ${distdir}/$f; done`
+  done
+  for size in ${sizes}; do
+    echo "Making ${distdir}-split/${size}dots.tar.gz..."
+    tar cfz ${distdir}-split/${size}dots.tar.gz ${distdir}/*/*${size}*.bdf \
+	`for f in ${files}; do echo ${distdir}/$f; done`
+  done
+fi
+
+if [ "${diff}" = "yes" ] ; then
+  if [ ${minor} = "0" ] ; then
+    if [ ${major} = "1" ] ; then
+      echo "${prog}:  There is no previous version." >&2
+      exit 1
+    fi
+    prev_major=`expr ${major} - 1`
+    # Find the previous greatest minor version.
+    prev_minor=0
+    for dir in intlfonts-${prev_major}.*; do
+      this=`echo ${dir} | sed  's/intlfonts-[0-9][0-9]*\.\([0-9][0-9]*\)/\1/`
+      if [ ${this} -gt ${prev_minor} ] ; then prev_minor=${this}; fi
+    done
+  else
+    prev_major=${major}
+    prev_minor=`expr ${minor} - 1`
+  fi
+  prev_version=${prev_major}.${prev_minor}
+  prevdir=intlfonts-${prev_version}
+  diff_file=intlfonts-${prev_version}-${version}.diff
+  echo "Making ${diff_file}..."
+
+  if [ ! -d ${prevdir} ] ; then
+    echo "${prog}: Directory ${prevdir} does not exist." >&2
+    exit 1
+  fi
+  
+  diff -acrN ${prevdir} ${distdir} > ${diff_file}
+fi
+    
+exit 0
+### make-dist ends here
