@@ -742,15 +742,11 @@ converted to PDF at the same location."
 (require 'htmlize)
 
 ;; Python
-(setq python-environment-virtualenv '("virtualenv" "--system-site-packages" "--quiet" "--python" "D:/Tools/cygwin/bin/python3"))
 (require 'jedi-direx)
 (add-hook 'python-mode-hook 'jedi:setup)
 (setq jedi:complete-on-dot t)
 (setq jedi:setup-keys t)
-(eval-after-load "python"
-  '(define-key python-mode-map "\C-cx" 'jedi-direx:pop-to-buffer))
 (add-hook 'jedi-mode-hook 'jedi-direx:setup)
-(setq jedi:server-command '("D:/Tools/cygwin/bin/python3" "C:/Users/qiang/.emacs.d/elpa/jedi-core-20160709.722/jediepcserver.py"))
 
 ;; GNU global
 (setq gtags-suggested-key-mapping t)
